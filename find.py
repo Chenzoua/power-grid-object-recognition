@@ -548,6 +548,106 @@
 # for missing_file in missing_files:
 #     print(f"File not found in image folder: {missing_file}")
 
+# import os
+# import shutil
+#
+# # 指定要遍历的文件夹路径
+# folder_path = '/home/zhihui/Dataset/csg_result_0'
+# folder_path2 = '/home/zhihui/Dataset/data_2/images'
+#
+# # 指定要保存文件名的txt文件
+# output_file = 'image_filenames.txt'
+#
+# # 支持的图片文件扩展名
+# image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp']
+#
+# # 遍历文件夹并写入文件名到txt文件
+# with open(output_file, 'w') as txt_file:
+#     for root, dirs, files in os.walk(folder_path):
+#         for file in files:
+#             file_path = os.path.join(root, file)
+#             # 检查文件扩展名是否为图片格式
+#             if any(file_path.lower().endswith(ext) for ext in image_extensions):
+#                 txt_file.write(file + '\n')
+#
+# print(f'Image filenames have been written to {output_file}')
+#
+#
+# # 新建目标文件夹的路径
+# new_folder_path = '/home/zhihui/Dataset/csg_result_0/get'
+#
+# # 创建用户指定的目标文件夹
+# os.makedirs(new_folder_path, exist_ok=True)
+#
+# # 读取txt文件中的文件名
+# with open('image_filenames.txt', 'r') as txt_file:
+#     image_filenames = txt_file.read().splitlines()
+#
+# # 遍历文件名列表并复制文件到新文件夹
+# for filename in image_filenames:
+#     source_file = os.path.join(folder_path2, filename)
+#     if os.path.isfile(source_file):
+#         destination_file = os.path.join(new_folder_path, filename)
+#         shutil.copy(source_file, destination_file)
+#
+# print(f'Files from image_filenames.txt have been copied to {new_folder_path}')
+
+# ##删除像素较小的部分图像
+# import os
+# from pathlib import Path
+# from typing import List
+#
+# def get_file_size(file_path: Path) -> int:
+#     """获取文件大小"""
+#     return file_path.stat().st_size
+#
+# def get_sorted_files(folder_path: Path) -> List[Path]:
+#     """获取文件夹内所有文件，并按文件大小排序"""
+#     files = list(folder_path.glob('*'))
+#     files.sort(key=get_file_size)
+#     return files
+# def remove_top_n_files(files: List[Path], n: int) -> None:
+#     for file in files[:n]:
+#         file.unlink()
+#
+# if __name__ == '__main__':
+#     folder_path = Path('/home/zhihui/Dataset/lig_cut/image')
+#     files = get_sorted_files(folder_path)
+#     remove_top_n_files(files, 500)
+
+import os
+from pathlib import Path
+
+img_folder = Path('/home/zhihui/Dataset/lig_cut/image')
+label_folder = Path('/home/zhihui/Dataset/lig_cut/label')
+
+img_files = list(img_folder.glob('*.jpg')) + list(img_folder.glob('*.png'))+ list(img_folder.glob('*.jpeg'))
+label_files = list(label_folder.glob('*.txt'))
+
+# 获取所有文件名(不含扩展名)
+img_names = [str(path.stem) for path in img_files]
+label_names = [str(path.stem) for path in label_files]
+
+# 查找不匹配的文件名
+to_delete = []
+for name in img_names:
+    if name not in label_names:
+        to_delete.append(name)
+for name in label_names:
+    if name not in img_names:
+        to_delete.append(name)
+
+# 删除不匹配的文件
+for name in to_delete:
+    img_file = img_folder / (name + '.jpg')
+    label_file = label_folder / (name + '.txt')
+
+    if img_file.exists():
+        img_file.unlink()
+    if label_file.exists():
+        label_file.unlink()
+
+
 
 
 
